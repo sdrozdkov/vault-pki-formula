@@ -18,8 +18,11 @@
 
 {% set os_family = grains['os_family'] -%}
 
-include:
-  - python.pip
+
+python3-pip:
+  pkg.installed:
+    - pkgs:
+      - python3-pip
 
 setup new cert-access group:
   group.present:
@@ -28,27 +31,17 @@ setup new cert-access group:
 install crypto dependencies:
   pkg.installed:
     - pkgs:
-{% if os_family == 'Debian' %}
-      - python-dev
+      - python3-dev
       - libssl-dev
       - libffi-dev
-{% elif os_family == 'RedHat' %}
-      - python-devel
-      - libffi-devel
-      - openssl-libs
-{% endif -%}
 
 install python cryptography module:
   pip.installed:
     - name: cryptography
-{% if os_family == 'Debian' %}
-    - bin_env: /usr/local/bin/pip2
-{% elif os_family == 'RedHat' %}
-    - bin_env: /usr/bin/pip2
-{% endif %}
+    - bin_env: /usr/bin/pip3
     - reload_modules: true
     - require:
-      - pkg: python2-pip
+      - python3-pip
 
 /usr/local/bin/vault_pki:
   file.managed:
@@ -57,6 +50,14 @@ install python cryptography module:
     - group: root
     - mode: 0755
 
+install python salt lib module:
+  pip.installed:
+    - name: salt
+    - bin_env: /usr/bin/pip3
+    - reload_modules: true
+    - require:
+      - python3-pip
+
 run vault_pki to get initial cert:
   cmd.run:
     - name: /usr/local/bin/vault_pki checkgen
@@ -64,6 +65,7 @@ run vault_pki to get initial cert:
       - group: setup new cert-access group
       - pkg: install crypto dependencies
       - pip: install python cryptography module
+      - pip: install python salt lib module
       - file: /usr/local/bin/vault_pki
 
 checkgen_cert:

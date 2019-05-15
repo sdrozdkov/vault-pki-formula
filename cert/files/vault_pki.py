@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 #   Copyright 2018 Ripple Labs, Inc.
@@ -116,7 +116,7 @@ import datetime
 import grp
 import logging
 import os
-import platform
+import socket
 import re
 import stat
 import subprocess
@@ -255,7 +255,7 @@ def generate(fqdn, write_dir, key_length, mode, owner_uid, group_gid):
             )
         priv_key_filepath = os.path.join(write_dir, key_filename)
         try:
-            with open(priv_key_filepath, 'w') as keyfile:
+            with open(priv_key_filepath, 'wb') as keyfile:
                 keyfile.write(priv_key.private_bytes(
                     encoding=serialization.Encoding.PEM,
                     format=key_format,
@@ -536,7 +536,7 @@ def _get_version_assets(version_str, fqdn=None, base_dir=BASE_DIR):
     path_join = os.path.join
     is_dir = os.path.isdir
     if not fqdn:
-        fqdn = platform.node()
+        fqdn = socket.getfqdn()
     format_settings = {'base': base_dir, 'fqdn': fqdn}
     archive_dir = ARCHIVE_DIR.format(**format_settings)
     key_dir = KEY_DIR.format(**format_settings)
@@ -569,7 +569,7 @@ def get_post_activate_scripts(base_dir=BASE_DIR):
     """
     format_settings = {'base': base_dir}
     post_activate_dir = POST_ACTIVATE_DIR.format(**format_settings)
-    path, _, activate_files = os.walk(post_activate_dir).next()
+    path, _, activate_files = next(os.walk(post_activate_dir))
     activate_scripts = []
     for script in activate_files:
         script_path = os.path.join(path, script)
@@ -624,7 +624,7 @@ def activate_main(args):
     if not re.match(VERSION_DIR_REGEX, version_str):
         logger.critical('Invalid version string: "{}"'.format(version_str))
         sys.exit(1)
-    fqdn = platform.node()
+    fqdn = socket.getfqdn()
     format_settings = {'base': BASE_DIR, 'fqdn': fqdn}
     live_dir = LIVE_DIR.format(**format_settings)
     if not os.access(live_dir, os.W_OK):
@@ -650,7 +650,7 @@ def checkgen_main(args):
     Note: this sub-command does *not* activate the new cert by switching
     symlinks, please see the activate sub-command for that.
     """
-    fqdn = platform.node()
+    fqdn = socket.getfqdn()
     if not fqdn:
         raise SetupError('Missing FQDN!')
     try:
@@ -695,7 +695,7 @@ def checkgen_main(args):
 
 
 def list_main(args):
-    fqdn = platform.node()
+    fqdn = socket.getfqdn()
     if not fqdn:
         raise SetupError('Missing FQDN!')
     format_settings = {'base': BASE_DIR, 'fqdn': fqdn}

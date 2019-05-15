@@ -1,4 +1,4 @@
-# Vault PKI Formula
+# Vault PKI Formula (python3 compatible version)
 
 A SaltStack formula to issue and automatically update and distribute
 certificates from a private certificate authority backed by
