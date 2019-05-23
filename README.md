@@ -5,7 +5,7 @@ certificates from a private certificate authority backed by
 [Hashicorp Vault](https://www.vaultproject.io/).
 
 Server-side installation and operation is covered in the documentation
-for the [Vault PKI Runner](https://github.com/ripple/salt-runner-vault-pki).
+for the [Vault PKI Runner](https://github.com/sdrozdkov/salt-runner-vault-pki).
 This formula requires the associated Vault PKI Runner to be installed on
 the Salt master to operate.
 
@@ -21,7 +21,7 @@ Events from the minion perspective, *during first application*, in order:
    ```/etc/vault_pki``` directory structure, generates a CSR and fires a
    Salt event with the CSR and other data to request a signed certificate.
 3. Server side magic modifies the CSR and gets it signed, see
-   [Vault PKI Runner](https://github.com/ripple/salt-runner-vault-pki/blob/master/README.md)
+   [Vault PKI Runner](https://github.com/sdrozdkov/salt-runner-vault-pki/blob/master/README.md)
    docs for details.
 4. More server side magic writes the signed certificate to the minion and
    runs the ```react_activate_cert``` state on minion.  The state in turn 
